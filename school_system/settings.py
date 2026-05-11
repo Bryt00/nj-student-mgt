@@ -191,12 +191,17 @@ UNFOLD = {
                 "separator": True,
                 "items": [
                     {
-                        "title": "Users",
+                        "title": "Manage Users",
                         "icon": "manage_accounts",
                         "link": "/portal/auth/user/",
                     },
                     {
-                        "title": "Groups",
+                        "title": "Add New Staff",
+                        "icon": "person_add",
+                        "link": "/portal/auth/user/add/",
+                    },
+                    {
+                        "title": "Groups & Permissions",
                         "icon": "group",
                         "link": "/portal/auth/group/",
                     },
@@ -216,6 +221,19 @@ UNFOLD = {
                 },
             ],
         },
+    ],
+    "STYLES": [
+        lambda request: """
+            input[type='text'], input[type='password'], input[type='email'], input[type='number'], select, textarea {
+                border: 1px solid rgba(255, 255, 255, 0.2) !important;
+                background-color: rgba(255, 255, 255, 0.05) !important;
+                color: white !important;
+            }
+            input:focus {
+                border-color: #2563eb !important;
+                outline: none !important;
+            }
+        """
     ],
 }
 
