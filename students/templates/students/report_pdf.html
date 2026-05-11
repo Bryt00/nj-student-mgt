@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        @page {
+            size: a4;
+            margin: 1cm;
+        }
+        body {
+            font-family: Helvetica, sans-serif;
+            color: #333;
+        }
+        .header {
+            text-align: center;
+            border-bottom: 2px solid #2563eb;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        .header h1 {
+            color: #1e40af;
+            margin: 0;
+            font-size: 24px;
+        }
+        .header p {
+            margin: 5px 0;
+            color: #64748b;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        th, td {
+            border: 1px solid #e2e8f0;
+            padding: 8px;
+            font-size: 10px;
+            text-align: left;
+        }
+        th {
+            background-color: #f8fafc;
+            color: #475569;
+            font-weight: bold;
+        }
+        .footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            text-align: center;
+            font-size: 8px;
+            color: #94a3b8;
+            border-top: 1px solid #e2e8f0;
+            padding-top: 5px;
+        }
+        .summary {
+            margin-bottom: 20px;
+            padding: 10px;
+            background-color: #eff6ff;
+            border-radius: 5px;
+        }
+        .summary-item {
+            font-size: 12px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>EDUANALYTICS ACADEMIC REPORT</h1>
+        <p>Student Data Management System</p>
+    </div>
+
+    <div class="summary">
+        <div class="summary-item">Total Students in Report: {{ count }}</div>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>No.</th>
+                <th>Surname</th>
+                <th>Firstname</th>
+                <th>Gender</th>
+                <th>Class</th>
+                <th>Course</th>
+                <th>House</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for student in students %}
+            <tr>
+                <td>{{ forloop.counter }}</td>
+                <td>{{ student.surname }}</td>
+                <td>{{ student.firstname }}</td>
+                <td>{{ student.gender }}</td>
+                <td>{{ student.student_class.name }}</td>
+                <td>{{ student.student_course.code|default:"N/A" }}</td>
+                <td>{{ student.house.name|default:"N/A" }}</td>
+                <td>{{ student.residence_status }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <div class="footer">
+        Generated on: {{ now|date:"Y-m-d H:i" }} | EduAnalytics - Professional School Management
+    </div>
+</body>
+</html>

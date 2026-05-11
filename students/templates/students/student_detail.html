@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Profile | School Management</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #6366f1;
+            --bg-main: #f8fafc;
+            --bg-card: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 600px;
+            padding: 2rem;
+        }
+
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 1.5rem;
+            padding: 3rem;
+            box-shadow: var(--shadow);
+        }
+
+        .profile-header {
+            text-align: center;
+            margin-bottom: 2.5rem;
+        }
+
+        .avatar {
+            width: 80px;
+            height: 80px;
+            background: var(--primary);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 2rem;
+            font-weight: 700;
+            margin: 0 auto 1.5rem;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        h1 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.75rem;
+            margin: 0 0 0.5rem 0;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            background: #e0e7ff;
+            color: #4338ca;
+            font-size: 0.875rem;
+            font-weight: 600;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .info-item label {
+            display: block;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            margin-bottom: 0.25rem;
+        }
+
+        .info-item .value {
+            font-size: 1rem;
+            font-weight: 500;
+        }
+
+        .actions {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .btn {
+            flex: 1;
+            text-align: center;
+            padding: 0.75rem;
+            border-radius: 0.5rem;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.875rem;
+            transition: all 0.2s;
+            border: 1px solid transparent;
+        }
+
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-outline { background: white; color: var(--text-muted); border: 1px solid var(--border); }
+        .btn-danger { background: #fee2e2; color: #b91c1c; }
+
+        .btn:hover { opacity: 0.9; transform: translateY(-1px); }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <div class="profile-header">
+                <div class="avatar">
+                    {{ student.firstname|slice:":1" }}{{ student.surname|slice:":1" }}
+                </div>
+                <h1>{{ student.firstname }} {{ student.surname }}</h1>
+                <div class="badge">{{ student.residence_status }} Student</div>
+            </div>
+
+            <div class="info-grid">
+                <div class="info-item">
+                    <label>Gender</label>
+                    <div class="value">{{ student.get_gender_display }}</div>
+                </div>
+                <div class="info-item">
+                    <label>Class</label>
+                    <div class="value">{{ student.student_class.name }}</div>
+                </div>
+                <div class="info-item">
+                    <label>Course</label>
+                    <div class="value">{{ student.student_course.name|default:"N/A" }}</div>
+                </div>
+                <div class="info-item">
+                    <label>Date of Birth</label>
+                    <div class="value">{{ student.date_of_birth }}</div>
+                </div>
+                <div class="info-item">
+                    <label>Guardian</label>
+                    <div class="value">{{ student.guardian_name }}</div>
+                </div>
+                <div class="info-item">
+                    <label>Contact</label>
+                    <div class="value">{{ student.guardian_phone }}</div>
+                </div>
+                <div class="info-item">
+                    <label>House</label>
+                    <div class="value">{{ student.house.name|default:"N/A" }}</div>
+                </div>
+            </div>
+            
+            <div style="margin-top: 1rem; border-top: 1px solid var(--border); padding-top: 1.5rem;">
+                <h3 style="font-size: 0.75rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; margin-bottom: 1rem;">Academic Curriculum</h3>
+                
+                <div style="margin-bottom: 1.5rem;">
+                    <label style="display: block; font-size: 0.7rem; color: var(--primary); font-weight: 700; margin-bottom: 0.5rem;">CORE SUBJECTS</label>
+                    <div style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
+                        {% for subject in student.student_class.subjects.all %}
+                            {% if subject.subject_type == 'CORE' %}
+                            <span style="background: #eff6ff; color: #1e40af; padding: 0.35rem 0.75rem; border-radius: 0.5rem; font-size: 0.75rem; font-weight: 600; border: 1px solid #bfdbfe;">
+                                {{ subject.name }}
+                            </span>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div>
+                    <label style="display: block; font-size: 0.7rem; color: #b45309; font-weight: 700; margin-bottom: 0.5rem;">ELECTIVE SUBJECTS</label>
+                    <div style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
+                        {% for subject in student.student_class.subjects.all %}
+                            {% if subject.subject_type == 'ELECTIVE' %}
+                            <span style="background: #fffbeb; color: #92400e; padding: 0.35rem 0.75rem; border-radius: 0.5rem; font-size: 0.75rem; font-weight: 600; border: 1px solid #fde68a;">
+                                {{ subject.name }}
+                            </span>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="actions" style="margin-top: 2rem;">
+                <a href="{% url 'dashboard' %}" class="btn btn-outline">Back</a>
+                <a href="{% url 'edit_student' student.pk %}" class="btn btn-primary">Edit</a>
+                <a href="{% url 'delete_student' student.pk %}" class="btn btn-danger">Delete</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

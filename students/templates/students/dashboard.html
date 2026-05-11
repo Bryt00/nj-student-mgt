@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Data Management</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary: #64748b;
+            --bg-main: #f8fafc;
+            --bg-card: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            margin: 0;
+            padding: 0;
+            line-height: 1.5;
+        }
+
+        .navbar {
+            background: white;
+            border-bottom: 1px solid var(--border);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 50;
+        }
+
+        .navbar h1 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.25rem;
+            margin: 0;
+            color: var(--primary);
+            font-weight: 800;
+        }
+
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .header-section {
+            margin-bottom: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            box-shadow: var(--shadow);
+        }
+
+        .stat-card h3 {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+            margin: 0 0 0.5rem 0;
+            font-weight: 500;
+        }
+
+        .stat-card .value {
+            font-size: 1.875rem;
+            font-weight: 700;
+            color: var(--text-main);
+            font-family: 'Outfit', sans-serif;
+        }
+
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 1rem;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            margin-bottom: 2rem;
+        }
+
+        .card-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .card-header h2 {
+            margin: 0;
+            font-size: 1.125rem;
+            font-weight: 600;
+        }
+
+        .filter-section {
+            padding: 1.5rem;
+            background: #f1f5f9;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .filter-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            align-items: flex-end;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .form-group label {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+        }
+
+        input, select {
+            padding: 0.625rem 0.875rem;
+            border: 1px solid var(--border);
+            border-radius: 0.5rem;
+            background: white;
+            font-size: 0.875rem;
+            color: var(--text-main);
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.625rem 1.25rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+            border: 1px solid transparent;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+        }
+
+        .btn-outline {
+            background: white;
+            border-color: var(--border);
+            color: var(--text-main);
+        }
+
+        .btn-outline:hover {
+            background: #f8fafc;
+        }
+
+        .table-container {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            background: #f8fafc;
+            padding: 1rem 1.5rem;
+            text-align: left;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            border-bottom: 1px solid var(--border);
+        }
+
+        td {
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid var(--border);
+            font-size: 0.875rem;
+        }
+
+        tr:hover {
+            background: #f8fafc;
+        }
+
+        .badge {
+            display: inline-flex;
+            padding: 0.25rem 0.625rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .badge-indigo { background: #e0e7ff; color: #4338ca; }
+        .badge-amber { background: #fef3c7; color: #92400e; }
+        .badge-green { background: #dcfce7; color: #166534; }
+        .badge-secondary { background: #f1f5f9; color: #475569; }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            padding: 1.5rem;
+            gap: 0.5rem;
+        }
+
+        .page-link {
+            padding: 0.5rem 0.875rem;
+            border: 1px solid var(--border);
+            border-radius: 0.375rem;
+            text-decoration: none;
+            color: var(--text-main);
+            font-size: 0.875rem;
+        }
+
+        .page-link.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #e2e8f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 0.75rem;
+            color: var(--secondary);
+            margin-right: 0.75rem;
+        }
+
+        @media (max-width: 768px) {
+            .header-section { flex-direction: column; align-items: stretch; gap: 1rem; }
+            .filter-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <h1>STUDENT DATA MANAGEMENT</h1>
+        <div style="display: flex; gap: 1rem;">
+            <a href="{% url 'add_student' %}" class="btn btn-primary">+ Add Student</a>
+            <a href="{% url 'upload_excel' %}" class="btn btn-outline">Upload File</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        {% if messages %}
+        <div style="margin-bottom: 2rem;">
+            {% for message in messages %}
+            <div style="padding: 1rem; border-radius: 0.5rem; margin-bottom: 1rem; background: {% if message.tags == 'success' %}#dcfce7{% else %}#fee2e2{% endif %}; color: {% if message.tags == 'success' %}#166534{% else %}#991b1b{% endif %}; border: 1px solid {% if message.tags == 'success' %}#bbf7d0{% else %}#fecaca{% endif %};">
+                {{ message }}
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <h3>Total Students</h3>
+                <div class="value">{{ total_count }}</div>
+            </div>
+            <div class="stat-card">
+                <h3>Filtered Results</h3>
+                <div class="value">{{ page_obj.paginator.count }}</div>
+            </div>
+            <div class="stat-card" style="grid-column: span 1;">
+                <h3 style="margin-bottom: 1rem;">Enrollment by Stream</h3>
+                <div style="display: flex; flex-wrap: wrap; gap: 0.75rem;">
+                    {% for c_stat in course_stats %}
+                    <div style="background: #f1f5f9; padding: 0.5rem 1rem; border-radius: 0.75rem; border: 1px solid var(--border);">
+                        <span style="font-weight: 700; color: var(--primary); font-size: 0.875rem;">{{ c_stat.student_course__code }}</span>
+                        <span style="font-weight: 800; font-size: 1rem; margin-left: 0.5rem;">{{ c_stat.total }}</span>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h2>Student Directory</h2>
+                <div style="display: flex; gap: 0.5rem;">
+                    <a href="{% url 'export_excel' %}?{{ request.GET.urlencode }}" class="btn btn-outline" style="padding: 0.4rem 0.8rem; font-size: 0.75rem;">Excel</a>
+                    <a href="{% url 'generate_pdf' %}?{{ request.GET.urlencode }}" class="btn btn-primary" style="padding: 0.4rem 0.8rem; font-size: 0.75rem;">Download PDF</a>
+                </div>
+            </div>
+
+            <div class="filter-section">
+                <form method="get" class="filter-grid">
+                    <div class="form-group">
+                        <label>Search</label>
+                        <input type="text" name="search" placeholder="Search by name..." value="{{ search_query|default:'' }}">
+                    </div>
+                    <div class="form-group">
+                        <label>Class</label>
+                        <select name="class_name">
+                            <option value="">All Classes</option>
+                            {% for class in classes %}
+                            <option value="{{ class }}" {% if class == class_filter %}selected{% endif %}>{{ class }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Course</label>
+                        <select name="course_name">
+                            <option value="">All Courses</option>
+                            {% for course in courses %}
+                            <option value="{{ course }}" {% if course == course_filter %}selected{% endif %}>{{ course }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Gender</label>
+                        <select name="gender">
+                            <option value="">All Genders</option>
+                            <option value="M" {% if gender_filter == 'M' %}selected{% endif %}>Male</option>
+                            <option value="F" {% if gender_filter == 'F' %}selected{% endif %}>Female</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Status</label>
+                        <select name="residence_status">
+                            <option value="">All Statuses</option>
+                            <option value="Day" {% if residence_filter == 'Day' %}selected{% endif %}>Day</option>
+                            <option value="Boarder" {% if residence_filter == 'Boarder' %}selected{% endif %}>Boarder</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Age Range</label>
+                        <select name="age_range">
+                            <option value="">All Ages</option>
+                            {% for range in age_ranges %}
+                            <option value="{{ range }}" {% if range == age_filter %}selected{% endif %}>{{ range }} Years</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div style="display: flex; gap: 0.5rem;">
+                        <button type="submit" class="btn btn-primary" style="flex: 1;">Filter</button>
+                        <a href="{% url 'dashboard' %}" class="btn btn-outline">Reset</a>
+                    </div>
+                </form>
+            </div>
+
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Student Name</th>
+                            <th>Gender</th>
+                            <th>Class</th>
+                            <th>Course</th>
+                            <th>Status</th>
+                            <th>Guardian</th>
+                            <th style="text-align: right;">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for student in page_obj %}
+                        <tr>
+                            <td>
+                                <div style="display: flex; align-items: center;">
+                                    <div class="avatar">{{ student.firstname|slice:":1" }}{{ student.surname|slice:":1" }}</div>
+                                    <div style="font-weight: 600;">{{ student.surname }}, {{ student.firstname }}</div>
+                                </div>
+                            </td>
+                            <td><span class="badge {% if student.gender == 'M' %}badge-indigo{% else %}badge-amber{% endif %}">{{ student.get_gender_display }}</span></td>
+                            <td>{{ student.student_class.name }}</td>
+                            <td style="font-size: 0.75rem;">{{ student.student_course.name|default:"N/A" }}</td>
+                            <td><span class="badge {% if student.residence_status == 'Boarder' %}badge-green{% else %}badge-secondary{% endif %}">{{ student.residence_status }}</span></td>
+                            <td>
+                                <div style="font-weight: 500;">{{ student.guardian_name }}</div>
+                                <div style="font-size: 0.75rem; color: var(--text-muted);">{{ student.guardian_phone }}</div>
+                            </td>
+                            <td style="text-align: right;">
+                                <a href="{% url 'student_detail' student.pk %}" class="btn btn-outline" style="padding: 0.35rem 0.75rem; font-size: 0.75rem;">View</a>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="7" style="text-align: center; padding: 4rem; color: var(--text-muted);">No students found matching your criteria.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            {% if page_obj.has_other_pages %}
+            <div class="pagination">
+                {% if page_obj.has_previous %}
+                <a href="?page={{ page_obj.previous_page_number }}{% if request.GET.urlencode %}&{{ request.GET.urlencode|slice:'7:' }}{% endif %}" class="page-link">Prev</a>
+                {% endif %}
+
+                {% for i in page_obj.paginator.page_range %}
+                    {% if page_obj.number == i %}
+                        <span class="page-link active">{{ i }}</span>
+                    {% elif i > page_obj.number|add:'-3' and i < page_obj.number|add:'3' %}
+                        <a href="?page={{ i }}{% if request.GET.urlencode %}&{{ request.GET.urlencode|slice:'7:' }}{% endif %}" class="page-link">{{ i }}</a>
+                    {% endif %}
+                {% endfor %}
+
+                {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}{% if request.GET.urlencode %}&{{ request.GET.urlencode|slice:'7:' }}{% endif %}" class="page-link">Next</a>
+                {% endif %}
+            </div>
+            {% endif %}
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h2>Distribution Analytics</h2>
+            </div>
+            <div style="padding: 1.5rem;">
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
+                    <!-- Gender & Residence Distribution -->
+                    <div style="background: #f8fafc; padding: 1.5rem; border-radius: 1rem; border: 1px solid var(--border);">
+                        <h3 style="font-size: 0.875rem; color: var(--text-muted); margin-bottom: 1.25rem;">Student Demographics</h3>
+                        
+                        <div style="margin-bottom: 1.5rem;">
+                            <div style="display: flex; justify-content: space-between; font-size: 0.75rem; font-weight: 600; margin-bottom: 0.5rem;">
+                                <span>Gender Distribution</span>
+                                <span>M: {{ male_count }} | F: {{ female_count }}</span>
+                            </div>
+                            <div style="height: 10px; background: #e2e8f0; border-radius: 5px; overflow: hidden; display: flex;">
+                                {% with total=page_obj.paginator.count %}
+                                    {% if total > 0 %}
+                                        <div style="height: 100%; width: {% widthratio male_count total 100 %}%; background: var(--primary);" title="Male"></div>
+                                        <div style="height: 100%; width: {% widthratio female_count total 100 %}%; background: #fb923c;" title="Female"></div>
+                                    {% endif %}
+                                {% endwith %}
+                            </div>
+                        </div>
+
+                        <div>
+                            <div style="display: flex; justify-content: space-between; font-size: 0.75rem; font-weight: 600; margin-bottom: 0.5rem;">
+                                <span>Residence Status</span>
+                                <span>Boarder: {{ boarder_count }} | Day: {{ day_count }}</span>
+                            </div>
+                            <div style="height: 10px; background: #e2e8f0; border-radius: 5px; overflow: hidden; display: flex;">
+                                {% with total=page_obj.paginator.count %}
+                                    {% if total > 0 %}
+                                        <div style="height: 100%; width: {% widthratio boarder_count total 100 %}%; background: #10b981;" title="Boarder"></div>
+                                        <div style="height: 100%; width: {% widthratio day_count total 100 %}%; background: #94a3b8;" title="Day"></div>
+                                    {% endif %}
+                                {% endwith %}
+                            </div>
+                        </div>
+
+                        <div>
+                            <div style="display: flex; justify-content: space-between; font-size: 0.75rem; font-weight: 600; margin-bottom: 0.5rem;">
+                                <span>Age Profile</span>
+                            </div>
+                            <div style="display: flex; gap: 0.5rem;">
+                                <div style="flex: 1; background: white; padding: 0.5rem; border-radius: 0.5rem; border: 1px solid var(--border); text-align: center;">
+                                    <div style="font-size: 0.6rem; color: var(--text-muted); font-weight: 700;">14-15</div>
+                                    <div style="font-weight: 700;">{{ total_14_15|default:"-" }}</div>
+                                </div>
+                                <div style="flex: 1; background: white; padding: 0.5rem; border-radius: 0.5rem; border: 1px solid var(--border); text-align: center;">
+                                    <div style="font-size: 0.6rem; color: var(--text-muted); font-weight: 700;">16-17</div>
+                                    <div style="font-weight: 700;">{{ total_16_17|default:"-" }}</div>
+                                </div>
+                                <div style="flex: 1; background: white; padding: 0.5rem; border-radius: 0.5rem; border: 1px solid var(--border); text-align: center;">
+                                    <div style="font-size: 0.6rem; color: var(--text-muted); font-weight: 700;">18+</div>
+                                    <div style="font-weight: 700;">{{ total_18_plus|default:"-" }}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- House Distribution -->
+                    <div style="background: #f8fafc; padding: 1.5rem; border-radius: 1rem; border: 1px solid var(--border);">
+                        <h3 style="font-size: 0.875rem; color: var(--text-muted); margin-bottom: 1.25rem;">House Enrollment</h3>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
+                            {% for h_stat in house_stats %}
+                            <div style="background: white; padding: 0.75rem; border-radius: 0.5rem; border: 1px solid var(--border); text-align: center;">
+                                <div style="font-size: 0.65rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">{{ h_stat.house__name }}</div>
+                                <div style="font-size: 1.25rem; font-weight: 800; color: var(--text-main);">{{ h_stat.total }}</div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="table-container">
+                    <h3 style="font-size: 0.875rem; color: var(--text-muted); margin-bottom: 1rem;">Detailed Class Breakdown</h3>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Class</th>
+                                <th>Course</th>
+                                <th>Gender</th>
+                                <th>Status</th>
+                                <th style="text-align: right;">Count</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for stat in stats_page_obj %}
+                            <tr>
+                                <td style="font-weight: 600;">{{ stat.student_class__name }}</td>
+                                <td style="font-size: 0.75rem;">{{ stat.student_course__name|default:"N/A" }}</td>
+                                <td>{{ stat.gender }}</td>
+                                <td>{{ stat.residence_status }}</td>
+                                <td style="text-align: right; font-weight: 700; color: var(--primary);">{{ stat.total }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                {% if stats_page_obj.has_other_pages %}
+                <div class="pagination" style="margin-top: 1.5rem;">
+                    {% if stats_page_obj.has_previous %}
+                    <a href="?stats_page={{ stats_page_obj.previous_page_number }}{% if request.GET.urlencode %}&{{ request.GET.urlencode|slice:'11:' }}{% endif %}" class="page-link">Prev</a>
+                    {% endif %}
+
+                    {% for i in stats_page_obj.paginator.page_range %}
+                        {% if stats_page_obj.number == i %}
+                            <span class="page-link active">{{ i }}</span>
+                        {% elif i > stats_page_obj.number|add:'-3' and i < stats_page_obj.number|add:'3' %}
+                            <a href="?stats_page={{ i }}{% if request.GET.urlencode %}&{{ request.GET.urlencode|slice:'11:' }}{% endif %}" class="page-link">{{ i }}</a>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% if stats_page_obj.has_next %}
+                    <a href="?stats_page={{ stats_page_obj.next_page_number }}{% if request.GET.urlencode %}&{{ request.GET.urlencode|slice:'11:' }}{% endif %}" class="page-link">Next</a>
+                    {% endif %}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</body>
+</html>
