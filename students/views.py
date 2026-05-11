@@ -8,7 +8,9 @@ from django.db.models import Count
 from django.db import models
 from django.template.loader import get_template
 from xhtml2pdf import pisa
+from django.contrib.auth.decorators import login_required
 
+@login_required
 def generate_report_pdf(request):
     # Reuse filtering logic from dashboard
     students = Student.objects.all().select_related('student_class', 'student_course', 'house')
@@ -59,10 +61,12 @@ def generate_report_pdf(request):
         return HttpResponse('Error generating PDF', status=500)
     return response
 
+@login_required
 def student_detail(request, pk):
     student = get_object_or_404(Student, pk=pk)
     return render(request, 'students/student_detail.html', {'student': student})
 
+@login_required
 def edit_student(request, pk):
     student = get_object_or_404(Student, pk=pk)
     if request.method == 'POST':
@@ -75,6 +79,7 @@ def edit_student(request, pk):
         form = StudentForm(instance=student)
     return render(request, 'students/edit_student.html', {'form': form, 'student': student})
 
+@login_required
 def delete_student(request, pk):
     student = get_object_or_404(Student, pk=pk)
     if request.method == 'POST':
@@ -83,6 +88,7 @@ def delete_student(request, pk):
         return redirect('dashboard')
     return render(request, 'students/delete_confirm.html', {'student': student})
 
+@login_required
 def add_student(request):
     if request.method == 'POST':
         form = StudentForm(request.POST)
@@ -94,6 +100,7 @@ def add_student(request):
         form = StudentForm()
     return render(request, 'students/add_student.html', {'form': form})
 
+@login_required
 def upload_excel(request):
     if request.method == 'POST':
         form = ExcelUploadForm(request.POST, request.FILES)
@@ -170,9 +177,12 @@ def get_filtered_students(request):
     residence_filter = request.GET.get('residence_status')
     search_query = request.GET.get('search')
     age_filter = request.GET.get('age_range')
+    year_filter = request.GET.get('year')
 
     if class_filter:
         students = students.filter(student_class__name=class_filter)
+    if year_filter:
+        students = students.filter(student_class__name__startswith=year_filter)
     if course_filter:
         students = students.filter(student_course__name=course_filter)
     if gender_filter:
@@ -196,6 +206,7 @@ def get_filtered_students(request):
         )
     return students
 
+@login_required
 def export_students_csv(request):
     students = get_filtered_students(request)
     response = HttpResponse(content_type='text/csv')
@@ -220,6 +231,7 @@ def export_students_csv(request):
     df.to_csv(path_or_buf=response, index=False)
     return response
 
+@login_required
 def export_students_excel(request):
     students = get_filtered_students(request)
     response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
@@ -246,6 +258,7 @@ def export_students_excel(request):
 
 from django.core.paginator import Paginator
 
+@login_required
 def dashboard(request):
     # Get filtered students
     students = get_filtered_students(request).order_by('surname', 'firstname')
@@ -257,6 +270,7 @@ def dashboard(request):
     residence_filter = request.GET.get('residence_status')
     search_query = request.GET.get('search')
     age_filter = request.GET.get('age_range')
+    year_filter = request.GET.get('year')
 
     # Simple filtering counts
     total_count = students.count()
@@ -316,5 +330,7 @@ def dashboard(request):
         'residence_filter': residence_filter,
         'search_query': search_query,
         'age_filter': age_filter,
+        'year_filter': year_filter,
+        'years': ['1', '2', '3'],
         'age_ranges': ['14-15', '16-17', '18+'],
     })
