@@ -8,20 +8,27 @@ echo "🚀 Starting EduAnalytics Deployment..."
 # 1. Update code (Assumes Git is used)
 # git pull origin main
 
-# 2. Activate virtual environment (Change path as needed)
-# source venv/bin/activate
+# 2. Virtual Environment Management
+if [ ! -d "venv" ]; then
+    echo "🌐 Creating virtual environment..."
+    python3 -m venv venv
+fi
+
+echo "🔌 Activating virtual environment..."
+source venv/bin/activate
 
 # 3. Install/Update dependencies
 echo "📦 Installing dependencies..."
+pip install --upgrade pip
 pip install -r requirements.txt
 
 # 4. Apply migrations
 echo "🗄️ Running database migrations..."
-python manage.py migrate --noinput
+python3 manage.py migrate --noinput
 
 # 5. Collect static files
 echo "🎨 Collecting static assets..."
-python manage.py collectstatic --noinput
+python3 manage.py collectstatic --noinput
 
 # 6. (Optional) Update Systemd & Nginx Configuration
 # Run this once or if your paths change
