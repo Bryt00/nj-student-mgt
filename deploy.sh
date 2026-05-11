@@ -28,6 +28,7 @@ python3 manage.py migrate --noinput
 
 # 5. Collect static files
 echo "🎨 Collecting static assets..."
+mkdir -p static
 python3 manage.py collectstatic --noinput
 
 # 6. (Optional) Update Systemd & Nginx Configuration
