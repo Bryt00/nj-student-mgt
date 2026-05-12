@@ -274,7 +274,7 @@
         </div>
         <div style="display: flex; gap: 1rem; align-items: center;">
             <a href="{% url 'add_student' %}" class="btn btn-primary">+ Add Student</a>
-            <a href="{% url 'upload_excel' %}" class="btn btn-outline" style="color: white; border-color: rgba(255,255,255,0.3);">Upload File</a>
+            <a href="{% url 'upload_excel' %}" class="btn" style="background: #10b981; color: white; border-color: #10b981;">📤 Bulk Upload</a>
             <form method="post" action="{% url 'logout' %}" style="margin: 0;">
                 {% csrf_token %}
                 <button type="submit" style="background: transparent; color: #fecaca; border: 1px solid rgba(254,202,202,0.3); padding: 0.4rem 0.8rem; border-radius: 0.5rem; font-size: 0.75rem; font-weight: 600; cursor: pointer;">

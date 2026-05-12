@@ -1,5 +1,16 @@
 import uuid
 from django.db import models
+from django.core.validators import RegexValidator
+from django.core.exceptions import ValidationError
+from datetime import date
+
+def validate_birth_date(value):
+    today = date.today()
+    age = today.year - value.year - ((today.month, today.day) < (value.month, value.day))
+    if age < 5:
+        raise ValidationError("Student must be at least 5 years old.")
+    if age > 30:
+        raise ValidationError("Student age seems too high for this school system.")
 
 class Subject(models.Model):
     SUBJECT_TYPE_CHOICES = [
@@ -58,13 +69,18 @@ class Student(models.Model):
         ('Boarder', 'Boarder'),
     ]
 
+    phone_validator = RegexValidator(
+        regex=r'^\d{10}$',
+        message="Phone number must be exactly 10 digits (e.g. 0244123456)."
+    )
+
     surname = models.CharField(max_length=100)
     firstname = models.CharField(max_length=100)
     other_names = models.CharField(max_length=200, blank=True, null=True)
     gender = models.CharField(max_length=1, choices=GENDER_CHOICES)
-    date_of_birth = models.DateField()
+    date_of_birth = models.DateField(validators=[validate_birth_date])
     guardian_name = models.CharField(max_length=200)
-    guardian_phone = models.CharField(max_length=20)
+    guardian_phone = models.CharField(max_length=10, validators=[phone_validator])
     student_class = models.ForeignKey(SchoolClass, on_delete=models.CASCADE, related_name='students')
     student_course = models.ForeignKey(Course, on_delete=models.SET_NULL, related_name='students', null=True, blank=True)
     house = models.ForeignKey(House, on_delete=models.SET_NULL, related_name='students', null=True, blank=True)

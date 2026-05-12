@@ -14,4 +14,5 @@ urlpatterns = [
     path('export/csv/', views.export_students_csv, name='export_students_csv'),
     path('export/excel/', views.export_students_excel, name='export_excel'),
     path('export/pdf/', views.generate_report_pdf, name='generate_pdf'),
+    path('download-template/', views.download_template, name='download_template'),
 ]

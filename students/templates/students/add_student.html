@@ -111,6 +111,14 @@
                 <div class="form-group">
                     <label>{{ field.label }}</label>
                     {{ field }}
+                    {% if field.help_text %}
+                    <small style="display: block; font-size: 0.7rem; color: var(--text-muted); margin-top: 0.25rem;">{{ field.help_text }}</small>
+                    {% endif %}
+                    {% if field.errors %}
+                    <div style="color: #ef4444; font-size: 0.75rem; font-weight: 500; margin-top: 0.25rem;">
+                        {% for error in field.errors %}{{ error }}{% endfor %}
+                    </div>
+                    {% endif %}
                 </div>
                 {% endfor %}
                 <button type="submit" class="btn">Save Student Data</button>

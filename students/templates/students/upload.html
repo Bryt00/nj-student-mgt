@@ -97,6 +97,13 @@
         <div class="card">
             <h1>Bulk Student Upload</h1>
             <p style="color: var(--text-muted); font-size: 0.875rem;">Import your student directory from an Excel file.</p>
+            
+            <div style="margin: 1.5rem 0; padding: 1rem; background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 0.75rem; text-align: left;">
+                <p style="margin: 0 0 0.5rem 0; font-size: 0.8rem; color: #1e40af; font-weight: 600;">First time? Download our template</p>
+                <a href="{% url 'download_template' %}" class="btn" style="background: #2563eb; font-size: 0.8rem; padding: 0.5rem 1rem; display: inline-block; width: auto;">
+                    📥 Download Excel Template
+                </a>
+            </div>
 
             <form method="post" enctype="multipart/form-data">
                 {% csrf_token %}

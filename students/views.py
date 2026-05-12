@@ -1,3 +1,4 @@
+from django.core.exceptions import ValidationError
 import pandas as pd
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse
@@ -118,11 +119,8 @@ def upload_excel(request):
                 # However, pandas usually reads the first row as headers.
                 
                 students_to_create = []
-                for _, row in df.iterrows():
-                    # Map the row to Student model
-                    # Using row.iloc for index-based access if headers are unknown, 
-                    # but let's try to be flexible.
-                    
+                errors = []
+                for index, row in df.iterrows():
                     try:
                         # Find or create the SchoolClass
                         class_obj, _ = SchoolClass.objects.get_or_create(name=str(row[7]))
@@ -144,22 +142,33 @@ def upload_excel(request):
                             gender=row[3],
                             date_of_birth=pd.to_datetime(row[4]).date(),
                             guardian_name=row[5],
-                            guardian_phone=row[6],
+                            guardian_phone=str(row[6]).strip().zfill(10) if pd.notna(row[6]) else "",
                             student_class=class_obj,
                             student_course=course_obj,
                             house=house_obj,
                             residence_status=row[8] if len(row) > 8 and pd.notna(row[8]) else 'Day'
                         )
+                        # Trigger model validation
+                        student.full_clean()
                         students_to_create.append(student)
+                    except ValidationError as ve:
+                        errors.append(f"Row {index+2}: {ve.message_dict if hasattr(ve, 'message_dict') else ve.messages}")
                     except Exception as e:
-                        messages.warning(request, f"Error processing row: {e}")
-                        continue
+                        errors.append(f"Row {index+2}: Unexpected error - {e}")
                 
                 if students_to_create:
                     Student.objects.bulk_create(students_to_create)
-                    messages.success(request, f"Successfully uploaded {len(students_to_create)} students.")
-                else:
-                    messages.error(request, "No valid data found in the file.")
+                    success_msg = f"Successfully uploaded {len(students_to_create)} students."
+                    if errors:
+                        success_msg += f" (Note: {len(errors)} rows failed validation)"
+                    messages.success(request, success_msg)
+                
+                if errors:
+                    # Show first 5 errors to avoid flooding
+                    for err in errors[:5]:
+                        messages.error(request, err)
+                    if len(errors) > 5:
+                        messages.error(request, f"...and {len(errors)-5} more errors.")
                 
                 return redirect('dashboard')
             except Exception as e:
@@ -168,6 +177,30 @@ def upload_excel(request):
         form = ExcelUploadForm()
     
     return render(request, 'students/upload.html', {'form': form})
+
+@login_required
+def download_template(request):
+    # Column headers in the order expected by upload_excel
+    columns = [
+        'Surname', 'First Name', 'Other Names', 'Gender (M/F)', 
+        'Date of Birth (YYYY-MM-DD)', 'Guardian Name', 'Guardian Phone', 
+        'Class Name', 'Residence Status (Day/Boarder)', 'Course Name', 'House'
+    ]
+    
+    # Sample data row
+    sample_data = [
+        ['Doe', 'John', 'Kojo', 'M', '2008-05-15', 'Mary Doe', '0240000000', '1A', 'Boarder', 'General Science', 'Aggrey House']
+    ]
+    
+    df = pd.DataFrame(sample_data, columns=columns)
+    
+    response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    response['Content-Disposition'] = 'attachment; filename="student_upload_template.xlsx"'
+    
+    with pd.ExcelWriter(response, engine='openpyxl') as writer:
+        df.to_excel(writer, index=False)
+    
+    return response
 
 def get_filtered_students(request):
     students = Student.objects.all()
